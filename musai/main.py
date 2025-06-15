@@ -1,103 +1,26 @@
 import pygame
-from sys import exit
+import sys
+from classes.player import Player 
+from classes.game import Game, GAME_HEIGHT, GAME_WIDTH
 
-# needed to initialize pygame and all of its subcomponents
-pygame.init()
+game = Game()
+player = Player(GAME_HEIGHT//10, GAME_WIDTH//2, 200, 20)
 
-# the main screen of our game - you can only have one
-screen = pygame.display.set_mode((800, 400))
-
-# clock object to manage our framerate
-clock = pygame.time.Clock()
-
-# creating a text and text surface
-test_font = pygame.font.Font("fonts/Pixeltype.ttf", 50)
-
-# colors
-text_color = (64,64,64)
-box_color = '#c0e8ec'
-
-# a surface that we can draw on or load images - we can have as many as we want
-sky_surface = pygame.image.load("assets/sky.png").convert()
-ground_surface = pygame.image.load("assets/ground.png").convert()
-text_surface = test_font.render("Game Over", False, text_color)
-text_rect = text_surface.get_rect(midtop = (400, 50))
-snail_surface = pygame.image.load("assets/snail1.png").convert_alpha()
-snail_rect = snail_surface.get_rect(midbottom = (600, 300))
-player_surf = pygame.image.load("assets/player_stand.png").convert_alpha()
-player_rect = player_surf.get_rect(midbottom = (80,300))
-restart_bttn = pygame.Surface((150, 50))
-restart_bttn_rect = restart_bttn.get_rect(midtop = (400, 150))
-
-# loading our music
-level0_music = pygame.mixer.music.load("music/level1.ogg", "ogg")
-
-# playing our music - running this outside of the loop
-# running this inside the loop causes the music to bug out
-jump_snd = pygame.mixer.Sound("sound_effects/jump.wav")
-
-# gravity
-player_gravity = 0
-
-game_active = True
-
-# a while loop to keep our game running
 while True:
-    # checking for the quit event so that we can exit our game
+    move_right = False
+    move_left = False
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
-            exit()
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            mouse_pos = pygame.mouse.get_pos()
-            if player_rect.collidepoint(mouse_pos):
-                player_gravity = -20
-                player_rect.bottom += player_gravity
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE and player_rect.bottom == 300:
-                pygame.mixer.Sound.play(jump_snd)
-                player_gravity = -20
-                player_rect.bottom += player_gravity
-    
-    if game_active:
-        player_gravity += 1
-        player_rect.top += player_gravity
-
-        if player_rect.bottom >= 300:
-            player_rect.bottom = 300
-
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT]:
-            player_rect.left += -2
-        if keys[pygame.K_RIGHT]:
-            player_rect.right += 2
-
-        # blit is short for block image transfer 
-        # allows us to attach another surface to another surface
-        # in this case  we are attaching to our main display
-        screen.blit(sky_surface, (0, 0))
-        screen.blit(ground_surface, (0, 300))
-        pygame.draw.rect(screen, box_color, text_rect)
-        pygame.draw.rect(screen, box_color, text_rect, 10)
-
-        snail_rect.left -= 2
-        if snail_rect.left < -100:
-            snail_rect.left = 800 
-        screen.blit(snail_surface, snail_rect)
-
-        screen.blit(player_surf, player_rect)
-
-        if snail_rect.colliderect(player_rect):
-            game_active = False
-    else:
-        screen.blit(text_surface, text_rect)
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_SPACE]:
-            game_active = True
+            sys.exit()
         
-    # updates our screen
-    pygame.display.flip()
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_LEFT]:
+        player.move_left()
+    if keys[pygame.K_RIGHT]:
+        player.move_right()
 
-    # limits our framerate to 60
-    clock.tick(60)
-
+    game.screen.blit(game.bg, (0,0))
+    pygame.draw.rect(game.screen, 'yellow', player)
+    pygame.draw.circle(game.screen, 'yellow', (GAME_WIDTH//2, GAME_HEIGHT//2), 8)
+    pygame.display.update()
