@@ -1,5 +1,5 @@
 import pygame
-from settings import GAME_WIDTH, GAME_HEIGHT
+from classes.settings import GAME_WIDTH, GAME_HEIGHT
 
 class Game():
     def __init__(self):
